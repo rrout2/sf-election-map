@@ -1,0 +1,88 @@
+import type { Measure } from '../types'
+
+export const measures: Measure[] = [
+  {
+    id: '2018-06-prop-c',
+    title: 'Prop C: Tax on Commercial Rents for Childcare and Education',
+    election: 'June 2018',
+    date: '2018-06-05',
+    description: 'Tax on Commercial Rents for Childcare and Education',
+  },
+  {
+    id: '2018-06-prop-f',
+    title: 'Prop F: Right to Counsel',
+    election: 'June 2018',
+    date: '2018-06-05',
+    description: 'Right to Counsel for tenants facing eviction',
+  },
+  {
+    id: '2018-06-prop-g',
+    title: 'Prop G: SFUSD Parcel Tax',
+    election: 'June 2018',
+    date: '2018-06-05',
+    description: 'SFUSD Parcel Tax for teacher salaries and student programs',
+  },
+  {
+    id: '2018-11-prop-c',
+    title: 'Prop C: Our City, Our Home',
+    election: 'Nov 2018',
+    date: '2018-11-06',
+    description: 'Tax on gross receipts for homeless services',
+  },
+  {
+    id: '2020-03-jackie-primary',
+    title: 'Jackie for State Senate (Primary)',
+    election: 'Mar 2020',
+    date: '2020-03-03',
+    description: 'Jackie Fielder for State Senate Primary',
+  },
+  {
+    id: '2020-11-prop-i',
+    title: 'Prop I: Transfer Tax on Luxury Development',
+    election: 'Nov 2020',
+    date: '2020-11-03',
+    description: 'Increase transfer tax on properties over $10M',
+  },
+  {
+    id: '2020-11-prop-k',
+    title: 'Prop K: Social Housing Authorization',
+    election: 'Nov 2020',
+    date: '2020-11-03',
+    description: 'Authorization for social housing development',
+  },
+  {
+    id: '2020-11-jackie-general',
+    title: 'Jackie for State Senate (General)',
+    election: 'Nov 2020',
+    date: '2020-11-03',
+    description: 'Jackie Fielder for State Senate General',
+  },
+  {
+    id: '2022-11-prop-m',
+    title: 'Prop M: Empty Homes Tax',
+    election: 'Nov 2022',
+    date: '2022-11-08',
+    description: 'Tax on vacant residential units',
+  },
+  {
+    id: '2022-11-prop-o',
+    title: 'Prop O: City College Parcel Tax',
+    election: 'Nov 2022',
+    date: '2022-11-08',
+    description: 'Parcel tax for City College of SF',
+  },
+  {
+    id: '2022-11-prop-h',
+    title: 'Prop H: Even Year Elections',
+    election: 'Nov 2022',
+    date: '2022-11-08',
+    description: 'Move local elections to even-numbered years',
+  },
+  {
+    id: '2024-11-prop-l',
+    title: 'Prop L: Ridehail Tax for Muni',
+    election: 'Nov 2024',
+    date: '2024-11-05',
+    description: 'Tax on ride-hail trips to fund Muni',
+  },
+]

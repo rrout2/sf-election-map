@@ -1,0 +1,169 @@
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import type { GeographyType, FeatureCollection } from './types'
+import { measures } from './data/measures'
+import {
+  generateMockResults,
+  type GeneratedResult,
+} from './data/mockResults'
+import { calcRegionAverages, calcPrecinctAverages } from './utils/calculations'
+import MapView from './components/MapView'
+import MeasurePanel from './components/MeasurePanel'
+import GeographySelector from './components/GeographySelector'
+import Legend from './components/Legend'
+import './App.css'
+
+export default function App() {
+  const [geographyType, setGeographyType] = useState<GeographyType>('supervisor')
+  const [selectedMeasures, setSelectedMeasures] = useState<string[]>(() =>
+    measures.map((m) => m.id),
+  )
+  const [precinctGeo, setPrecinctGeo] = useState<FeatureCollection>()
+  const [supeGeo, setSupeGeo] = useState<FeatureCollection>()
+  const [assemblyGeo, setAssemblyGeo] = useState<FeatureCollection>()
+  const [bartGeo, setBartGeo] = useState<FeatureCollection>()
+  const [results, setResults] = useState<GeneratedResult[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string>()
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [precinctRes, supeRes, bartRes, assemblyRes] = await Promise.all([
+          fetch('/precincts.geojson'),
+          fetch('/supervisor-districts.geojson'),
+          fetch('/bart-districts.geojson'),
+          fetch('/assembly-districts.geojson'),
+        ])
+
+        const [pGeo, sGeo, bGeo, aGeo] = await Promise.all([
+          precinctRes.json() as Promise<FeatureCollection>,
+          supeRes.json() as Promise<FeatureCollection>,
+          bartRes.json() as Promise<FeatureCollection>,
+          assemblyRes.json() as Promise<FeatureCollection>,
+        ])
+
+        setPrecinctGeo(pGeo)
+        setSupeGeo(sGeo)
+        setBartGeo(bGeo)
+        setAssemblyGeo(aGeo)
+        setResults(generateMockResults(pGeo))
+        setLoading(false)
+      } catch (err) {
+        console.error('Failed to load geography data:', err)
+        setError('Failed to load geography data. Make sure GeoJSON files are in the public folder.')
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const precinctToRegion = useMemo(() => {
+    if (!precinctGeo) return new Map<string, string>()
+    const region = new Map<string, string>()
+    for (const feat of precinctGeo.features) {
+      const pid = String(feat.properties.prec_2022 ?? '')
+      switch (geographyType) {
+        case 'precincts':
+          region.set(pid, pid)
+          break
+        case 'supervisor':
+          region.set(pid, String(feat.properties.supe22 ?? ''))
+          break
+        case 'assembly':
+          region.set(pid, String(feat.properties.assemb22 ?? ''))
+          break
+        case 'bart':
+          region.set(pid, String(feat.properties.bart22 ?? ''))
+          break
+      }
+    }
+    return region
+  }, [precinctGeo, geographyType])
+
+  const regionNames = useMemo(() => {
+    const names = new Map<string, string>()
+    if (supeGeo) {
+      for (const f of supeGeo.features) {
+        const id = String(f.properties.sup_dist ?? f.properties.sup_dist_pad ?? '')
+        const n = f.properties.sup_name
+          ? `District ${id}: ${f.properties.sup_name}`
+          : `District ${id}`
+        names.set(id, n)
+      }
+    }
+    if (assemblyGeo) {
+      for (const f of assemblyGeo.features) {
+        const id = String(f.properties.assemb22 ?? f.id ?? '')
+        names.set(id, `AD ${id}`)
+      }
+    }
+    if (bartGeo) {
+      for (const f of bartGeo.features) {
+        const id = String(f.properties.bart22 ?? '')
+        names.set(id, `BART District ${id}`)
+      }
+    }
+    return names
+  }, [supeGeo, assemblyGeo, bartGeo])
+
+  const regionAverages = useMemo(() => {
+    if (results.length === 0 || selectedMeasures.length === 0) return new Map<string, number>()
+    const avgs = calcRegionAverages(results, precinctToRegion, regionNames, selectedMeasures)
+    const map = new Map<string, number>()
+    for (const a of avgs) {
+      map.set(a.id, a.avgYes)
+    }
+    return map
+  }, [results, precinctToRegion, regionNames, selectedMeasures])
+
+  const precinctAverages = useMemo(() => {
+    if (results.length === 0 || selectedMeasures.length === 0) return new Map<string, number>()
+    return calcPrecinctAverages(results, selectedMeasures)
+  }, [results, selectedMeasures])
+
+  const handleToggle = useCallback((id: string) => {
+    setSelectedMeasures((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    )
+  }, [])
+
+  if (loading) {
+    return <div className="app"><div className="loading">Loading geography data...</div></div>
+  }
+
+  if (error) {
+    return <div className="app"><div className="loading error">{error}</div></div>
+  }
+
+  return (
+    <div className="app">
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <h1>SF DSA Election Map</h1>
+          <p>Average yes % for DSA-endorsed ballot measures</p>
+        </div>
+        <GeographySelector value={geographyType} onChange={setGeographyType} />
+        <MeasurePanel
+          measures={measures}
+          selected={selectedMeasures}
+          onToggle={handleToggle}
+        />
+      </div>
+      <div className="map-container">
+        <MapView
+          geographyType={geographyType}
+          precinctGeo={precinctGeo}
+          supeGeo={supeGeo}
+          assemblyGeo={assemblyGeo}
+          bartGeo={bartGeo}
+          precinctAverages={precinctAverages}
+          regionAverages={regionAverages}
+          selectedMeasures={selectedMeasures}
+        />
+        <div className="legend-overlay">
+          <Legend numSelected={selectedMeasures.length} geographyType={geographyType} />
+        </div>
+      </div>
+    </div>
+  )
+}

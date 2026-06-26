@@ -1,0 +1,202 @@
+.app {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+  color: #666;
+}
+
+.loading.error {
+  color: #c00;
+}
+
+.sidebar {
+  width: 340px;
+  min-width: 340px;
+  height: 100%;
+  overflow-y: auto;
+  background: #fff;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+
+.sidebar-header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.sidebar-header h1 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.sidebar-header p {
+  font-size: 12px;
+  color: #666;
+}
+
+.geography-selector {
+  padding: 12px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.geography-selector h2 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.geo-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.geo-btn {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.geo-btn:hover {
+  background: #f0f0f0;
+}
+
+.geo-btn.active {
+  background: #1a73e8;
+  color: #fff;
+  border-color: #1a73e8;
+}
+
+.measure-panel {
+  padding: 12px 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.measure-panel h2 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  margin-bottom: 2px;
+}
+
+.hint {
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 12px;
+}
+
+.election-group {
+  margin-bottom: 12px;
+}
+
+.election-group h3 {
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 4px;
+  padding: 4px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.measure-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.measure-row input {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.measure-title {
+  color: #333;
+}
+
+.map-container {
+  flex: 1;
+  position: relative;
+}
+
+.legend-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 2;
+}
+
+.legend {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.legend-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.legend-scale {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.legend-swatch {
+  width: 18px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.legend-label {
+  font-size: 9px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.mapboxgl-popup-content {
+  font-size: 12px;
+  padding: 8px 12px;
+}
+
+.mapboxgl-popup-content h4 {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
