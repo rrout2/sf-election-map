@@ -11,6 +11,7 @@ import MeasurePanel from './components/MeasurePanel'
 import GeographySelector from './components/GeographySelector'
 import Legend from './components/Legend'
 import './App.css'
+import PasswordGate from './components/PasswordGate'
 
 export default function App() {
   const [geographyType, setGeographyType] = useState<GeographyType>('supervisor')
@@ -153,6 +154,7 @@ export default function App() {
   }
 
   return (
+    <PasswordGate>
     <div className={`app${dark ? ' dark' : ''}`}>
       <div className={`sidebar${sidebarOpen ? '' : ' sidebar--closed'}`}>
         <div className="sidebar-header">
@@ -212,5 +214,6 @@ export default function App() {
         </div>
       </div>
     </div>
+    </PasswordGate>
   )
 }
