@@ -201,6 +201,7 @@ export default function App() {
           onDeselectAll={() => setSelectedMeasures([])}
         />
       </div>
+      <div className={`sidebar-backdrop${sidebarOpen ? '' : ' sidebar-backdrop--hidden'}`} onClick={() => setSidebarOpen(false)} />
       <div className="map-container">
         <button className="sidebar-hamburger" onClick={() => setSidebarOpen(true)}>
           {'\u2630'}

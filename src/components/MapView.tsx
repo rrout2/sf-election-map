@@ -226,6 +226,10 @@ export default function MapView({
     }
 
     map.on('click', (e) => {
+      popup?.remove()
+      popup = null
+      clearHover()
+
       const features = e.point ? map.queryRenderedFeatures(e.point, { layers: [FILL_LAYER] }) : []
       if (features.length > 0) {
         const { featId, name, pctStr } = popupContent(features[0] as unknown as Record<string, unknown>)
@@ -233,36 +237,37 @@ export default function MapView({
         showPopup(featId, e.lngLat, name, pctStr)
       } else {
         pinned = false
-        popup?.remove()
-        popup = null
-        clearHover()
       }
     })
 
-    map.on('mousemove', FILL_LAYER, (e) => {
-      map.getCanvas().style.cursor = e.features && e.features.length > 0 ? 'pointer' : ''
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
 
-      if (!e.features || e.features.length === 0) {
+    if (!isTouch) {
+      map.on('mousemove', FILL_LAYER, (e) => {
+        map.getCanvas().style.cursor = e.features && e.features.length > 0 ? 'pointer' : ''
+
+        if (!e.features || e.features.length === 0) {
+          if (pinned) return
+          popup?.remove()
+          popup = null
+          clearHover()
+          return
+        }
+
+        if (pinned) return
+
+        const { featId, name, pctStr } = popupContent(e.features[0] as unknown as Record<string, unknown>)
+        showPopup(featId, e.lngLat, name, pctStr)
+      })
+
+      map.on('mouseleave', FILL_LAYER, () => {
+        map.getCanvas().style.cursor = ''
         if (pinned) return
         popup?.remove()
         popup = null
         clearHover()
-        return
-      }
-
-      if (pinned) return
-
-      const { featId, name, pctStr } = popupContent(e.features[0] as unknown as Record<string, unknown>)
-      showPopup(featId, e.lngLat, name, pctStr)
-    })
-
-    map.on('mouseleave', FILL_LAYER, () => {
-      map.getCanvas().style.cursor = ''
-      if (pinned) return
-      popup?.remove()
-      popup = null
-      clearHover()
-    })
+      })
+    }
 
     mapRef.current = map
 

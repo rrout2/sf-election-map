@@ -312,6 +312,10 @@
   margin-bottom: 4px;
 }
 
+  .sidebar-backdrop {
+    display: none;
+  }
+
   .sidebar-hamburger {
     position: absolute;
     top: 10px;
@@ -533,6 +537,17 @@
   .sidebar--closed {
     transform: translateX(-100%);
     box-shadow: none;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+  }
+
+  .sidebar-backdrop--hidden {
+    display: none;
   }
 
   .sidebar-hamburger {
