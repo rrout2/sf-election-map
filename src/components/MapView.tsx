@@ -40,12 +40,16 @@ function buildGeoData(
       const avg = geographyType === 'precincts'
         ? precinctAverages.get(id)
         : regionAverages.get(id)
+      const label = geographyType === 'supervisor' ? `District ${id}`
+        : geographyType === 'assembly' ? `AD ${id}`
+        : geographyType === 'bart' ? `BART District ${id}`
+        : f.properties?.name ?? id
       return {
         ...f,
         id,
         properties: {
           ...f.properties,
-          name: f.properties?.name ?? id,
+          name: label,
           avgYes: avg ?? -1,
         },
       } as FeatureCollection['features'][number]
