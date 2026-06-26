@@ -191,6 +191,8 @@ export default function App() {
           measures={measures}
           selected={selectedMeasures}
           onToggle={handleToggle}
+          onSelectAll={() => setSelectedMeasures(measures.map((m) => m.id))}
+          onDeselectAll={() => setSelectedMeasures([])}
         />
       </div>
       <div className="map-container">
