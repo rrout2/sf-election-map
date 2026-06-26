@@ -10,6 +10,7 @@ const OPTIONS: { value: GeographyType; label: string }[] = [
   { value: 'supervisor', label: 'Supervisor Districts' },
   { value: 'assembly', label: 'Assembly Districts' },
   { value: 'bart', label: 'BART Districts' },
+  { value: 'citywide', label: 'Citywide' },
 ]
 
 export default function GeographySelector({ value, onChange }: GeographySelectorProps) {

@@ -21,6 +21,7 @@ export default function App() {
   const [supeGeo, setSupeGeo] = useState<FeatureCollection>()
   const [assemblyGeo, setAssemblyGeo] = useState<FeatureCollection>()
   const [bartGeo, setBartGeo] = useState<FeatureCollection>()
+  const [citywideGeo, setCitywideGeo] = useState<FeatureCollection>()
   const [results, setResults] = useState<GeneratedResult[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>()
@@ -37,24 +38,27 @@ export default function App() {
   useEffect(() => {
     async function load() {
       try {
-        const [precinctRes, supeRes, bartRes, assemblyRes] = await Promise.all([
+        const [precinctRes, supeRes, bartRes, assemblyRes, citywideRes] = await Promise.all([
           fetch('/precincts.geojson'),
           fetch('/supervisor-districts.geojson'),
           fetch('/bart-districts.geojson'),
           fetch('/assembly-districts.geojson'),
+          fetch('/citywide.geojson'),
         ])
 
-        const [pGeo, sGeo, bGeo, aGeo] = await Promise.all([
+        const [pGeo, sGeo, bGeo, aGeo, cwGeo] = await Promise.all([
           precinctRes.json() as Promise<FeatureCollection>,
           supeRes.json() as Promise<FeatureCollection>,
           bartRes.json() as Promise<FeatureCollection>,
           assemblyRes.json() as Promise<FeatureCollection>,
+          citywideRes.json() as Promise<FeatureCollection>,
         ])
 
         setPrecinctGeo(pGeo)
         setSupeGeo(sGeo)
         setBartGeo(bGeo)
         setAssemblyGeo(aGeo)
+        setCitywideGeo(cwGeo)
         setResults(generatePrecinctResults(pGeo))
         setLoading(false)
       } catch (err) {
@@ -84,6 +88,9 @@ export default function App() {
         case 'bart':
           region.set(pid, String(feat.properties.bart22 ?? ''))
           break
+        case 'citywide':
+          region.set(pid, 'SF')
+          break
       }
     }
     return region
@@ -112,8 +119,9 @@ export default function App() {
         names.set(id, `BART District ${id}`)
       }
     }
+    names.set('SF', 'San Francisco')
     return names
-  }, [supeGeo, assemblyGeo, bartGeo])
+  }, [supeGeo, assemblyGeo, bartGeo, citywideGeo])
 
   const regionAverages = useMemo(() => {
     if (results.length === 0 || selectedMeasures.length === 0) return new Map<string, number>()
@@ -193,6 +201,7 @@ export default function App() {
           supeGeo={supeGeo}
           assemblyGeo={assemblyGeo}
           bartGeo={bartGeo}
+          citywideGeo={citywideGeo}
           precinctAverages={precinctAverages}
           regionAverages={regionAverages}
           selectedMeasures={selectedMeasures}

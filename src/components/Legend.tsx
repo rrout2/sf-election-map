@@ -17,7 +17,8 @@ export default function Legend({ numSelected, geographyType }: LegendProps) {
   const geoLabel = geographyType === 'precincts' ? 'Precincts'
     : geographyType === 'supervisor' ? 'Sup. Districts'
     : geographyType === 'assembly' ? 'Assembly Districts'
-    : 'BART Districts'
+    : geographyType === 'bart' ? 'BART Districts'
+    : 'Citywide'
 
   return (
     <div className="legend">

@@ -16,17 +16,19 @@ function buildGeoData(
   supeGeo?: FeatureCollection,
   assemblyGeo?: FeatureCollection,
   bartGeo?: FeatureCollection,
+  citywideGeo?: FeatureCollection,
 ): FeatureCollection {
   const baseGeo = {
     precincts: precinctGeo,
     supervisor: supeGeo,
     assembly: assemblyGeo,
     bart: bartGeo,
+    citywide: citywideGeo,
   }[geographyType]
 
   if (!baseGeo) return { type: 'FeatureCollection', features: [] }
 
-  const idKey: Record<GeographyType, string> = {
+  const idKey: Partial<Record<GeographyType, string>> = {
     precincts: 'prec_2022',
     supervisor: 'sup_dist',
     assembly: 'assemb22',
@@ -36,13 +38,16 @@ function buildGeoData(
   return {
     type: 'FeatureCollection',
     features: baseGeo.features.map((f, i) => {
-      const id = String(f.properties?.[idKey[geographyType]] ?? f.properties?.name ?? f.id ?? i)
+      const id = geographyType === 'citywide'
+        ? String(f.id ?? 'SF')
+        : String(f.properties?.[idKey[geographyType]!] ?? f.properties?.name ?? f.id ?? i)
       const avg = geographyType === 'precincts'
         ? precinctAverages.get(id)
         : regionAverages.get(id)
       const label = geographyType === 'supervisor' ? `District ${id}`
         : geographyType === 'assembly' ? `AD ${id}`
         : geographyType === 'bart' ? `BART District ${id}`
+        : geographyType === 'citywide' ? 'San Francisco'
         : f.properties?.name ?? id
       return {
         ...f,
@@ -63,6 +68,7 @@ interface MapViewProps {
   supeGeo?: FeatureCollection
   assemblyGeo?: FeatureCollection
   bartGeo?: FeatureCollection
+  citywideGeo?: FeatureCollection
   precinctAverages: Map<string, number>
   regionAverages: Map<string, number>
   selectedMeasures: string[]
@@ -75,6 +81,7 @@ export default function MapView({
   supeGeo,
   assemblyGeo,
   bartGeo,
+  citywideGeo,
   precinctAverages,
   regionAverages,
   selectedMeasures,
@@ -89,7 +96,7 @@ export default function MapView({
   })
   geoDataRef.current = buildGeoData(
     geographyType, precinctAverages, regionAverages,
-    precinctGeo, supeGeo, assemblyGeo, bartGeo,
+    precinctGeo, supeGeo, assemblyGeo, bartGeo, citywideGeo,
   )
 
   const selectedMeasuresRef = useRef(selectedMeasures)
@@ -172,7 +179,7 @@ export default function MapView({
         paint: {
           'line-color': '#666',
           'line-width': geographyTypeRef.current === 'precincts' ? 0.3 : 1,
-          'line-opacity': 0.5,
+          'line-opacity': geographyTypeRef.current === 'citywide' ? 0 : 0.5,
         },
       })
     }
@@ -287,6 +294,7 @@ export default function MapView({
     }
 
     map.setPaintProperty(LINE_LAYER, 'line-width', geographyType === 'precincts' ? 0.3 : 1)
+    map.setPaintProperty(LINE_LAYER, 'line-opacity', geographyType === 'citywide' ? 0 : 0.5)
   }, [geographyType, precinctAverages, regionAverages, selectedMeasures])
 
   return (

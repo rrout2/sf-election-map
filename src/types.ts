@@ -14,7 +14,7 @@ export interface PrecinctResult {
   pctYes: number
 }
 
-export type GeographyType = 'precincts' | 'supervisor' | 'assembly' | 'bart'
+export type GeographyType = 'precincts' | 'supervisor' | 'assembly' | 'bart' | 'citywide'
 
 export interface FeatureCollection {
   type: 'FeatureCollection'
