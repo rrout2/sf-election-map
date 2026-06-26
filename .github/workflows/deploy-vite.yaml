@@ -1,0 +1,30 @@
+name: Deploy to GitHub Pages
+
+on:
+    push:
+        branches:
+            - main
+
+permissions:
+    contents: write
+
+jobs:
+    build:
+        name: Build and Deploy
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v4
+
+            - name: Install and Build 🔧
+              run: |
+                  npm ci
+                  echo "VITE_MAPBOX_TOKEN=${{ secrets.VITE_MAPBOX_TOKEN }}" > .env
+                  npm run build
+
+            - name: Deploy 🚀
+              uses: JamesIves/github-pages-deploy-action@v4.6.4
+              with:
+                  branch: gh-pages
+                  folder: dist
