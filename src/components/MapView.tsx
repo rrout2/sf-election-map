@@ -35,13 +35,14 @@ function buildGeoData(
 
   return {
     type: 'FeatureCollection',
-    features: baseGeo.features.map((f) => {
-      const id = String(f.properties?.[idKey[geographyType]] ?? f.properties?.name ?? f.id ?? '')
+    features: baseGeo.features.map((f, i) => {
+      const id = String(f.properties?.[idKey[geographyType]] ?? f.properties?.name ?? f.id ?? i)
       const avg = geographyType === 'precincts'
         ? precinctAverages.get(id)
         : regionAverages.get(id)
       return {
         ...f,
+        id,
         properties: {
           ...f.properties,
           name: f.properties?.name ?? id,
@@ -145,9 +146,15 @@ export default function MapView({
               75, '#3ca54b',
               85, '#16782d',
             ],
-            'rgba(200,200,200,0.3)',
+            'rgba(0,0,0,0)',
           ],
           'fill-opacity': 0.8,
+          'fill-outline-color': [
+            'case',
+            ['==', ['feature-state', 'hover'], true],
+            '#000',
+            'rgba(0,0,0,0)',
+          ],
         },
       })
 
@@ -163,6 +170,7 @@ export default function MapView({
       })
 
       let popup: mapboxgl.Popup | null = null
+      let hoveredId: string | number | undefined
 
       map.on('mousemove', FILL_LAYER, (e) => {
         map.getCanvas().style.cursor = e.features && e.features.length > 0 ? 'pointer' : ''
@@ -170,10 +178,21 @@ export default function MapView({
         if (!e.features || e.features.length === 0) {
           popup?.remove()
           popup = null
+          if (hoveredId !== undefined) {
+            map.removeFeatureState({ source: SOURCE_ID, id: hoveredId })
+            hoveredId = undefined
+          }
           return
         }
 
         const feat = e.features[0]
+        const featId = (feat as unknown as Record<string, unknown>).id as string | number | undefined
+        if (featId !== undefined && featId !== hoveredId) {
+          if (hoveredId !== undefined) map.removeFeatureState({ source: SOURCE_ID, id: hoveredId })
+          map.setFeatureState({ source: SOURCE_ID, id: featId }, { hover: true })
+          hoveredId = featId
+        }
+
         const props = (feat as unknown as Record<string, unknown>).properties as Record<string, unknown> | undefined
         const name = (props?.name as string) ?? 'Unknown'
         const avg = (props?.avgYes as number) ?? -1
@@ -195,6 +214,10 @@ export default function MapView({
         map.getCanvas().style.cursor = ''
         popup?.remove()
         popup = null
+        if (hoveredId !== undefined) {
+          map.removeFeatureState({ source: SOURCE_ID, id: hoveredId })
+          hoveredId = undefined
+        }
       })
     })
 
