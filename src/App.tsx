@@ -15,7 +15,7 @@ import './App.css'
 export default function App() {
   const [geographyType, setGeographyType] = useState<GeographyType>('supervisor')
   const [selectedMeasures, setSelectedMeasures] = useState<string[]>(() =>
-    measures.map((m) => m.id),
+    measures.filter((m) => !m.id.includes('jackie')).map((m) => m.id),
   )
   const [precinctGeo, setPrecinctGeo] = useState<FeatureCollection>()
   const [supeGeo, setSupeGeo] = useState<FeatureCollection>()
@@ -139,10 +139,30 @@ export default function App() {
     <div className="app">
       <div className="sidebar">
         <div className="sidebar-header">
-          <h1>SF DSA Election Map</h1>
+          <h1>DSA SF Election Map</h1>
           <p>Average yes % for DSA-endorsed ballot measures</p>
         </div>
         <GeographySelector value={geographyType} onChange={setGeographyType} />
+        <label className="jackie-toggle">
+          <input
+            type="checkbox"
+            checked={selectedMeasures.some((id) => id.includes('jackie'))}
+            onChange={() => {
+              const jackieIds = measures.filter((m) => m.id.includes('jackie')).map((m) => m.id)
+              setSelectedMeasures((prev) => {
+                const hasAny = prev.some((id) => id.includes('jackie'))
+                if (hasAny) {
+                  return prev.filter((id) => !id.includes('jackie'))
+                } else {
+                  const set = new Set(prev)
+                  for (const id of jackieIds) set.add(id)
+                  return Array.from(set)
+                }
+              })
+            }}
+          />
+          <span>Jackie Races (2020)</span>
+        </label>
         <MeasurePanel
           measures={measures}
           selected={selectedMeasures}

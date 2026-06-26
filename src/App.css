@@ -86,6 +86,23 @@
   border-color: #1a73e8;
 }
 
+.jackie-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #444;
+}
+
+.jackie-toggle input {
+  margin: 0;
+  flex-shrink: 0;
+}
+
 .measure-panel {
   padding: 12px 20px;
   flex: 1;

@@ -3,10 +3,6 @@ import mapboxgl from 'mapbox-gl'
 import type { GeographyType, FeatureCollection } from '../types'
 
 const SF_CENTER: [number, number] = [-122.4194, 37.7749]
-const SF_BOUNDS: [[number, number], [number, number]] = [
-  [-122.55, 37.68],
-  [-122.33, 37.83],
-]
 
 const SOURCE_ID = 'election-data'
 const FILL_LAYER = 'election-fill'
@@ -105,7 +101,8 @@ export default function MapView({
       style: 'mapbox://styles/mapbox/light-v11',
       center: SF_CENTER,
       zoom: 10.5,
-      maxBounds: SF_BOUNDS,
+      minZoom: 8,
+      maxZoom: 16,
       attributionControl: false,
       scrollZoom: true,
       dragRotate: true,
