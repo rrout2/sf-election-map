@@ -2,9 +2,9 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import type { GeographyType, FeatureCollection } from './types'
 import { measures } from './data/measures'
 import {
-  generateMockResults,
+  generatePrecinctResults,
   type GeneratedResult,
-} from './data/mockResults'
+} from './data/precinctResults'
 import { calcRegionAverages, calcPrecinctAverages } from './utils/calculations'
 import MapView from './components/MapView'
 import MeasurePanel from './components/MeasurePanel'
@@ -46,7 +46,7 @@ export default function App() {
         setSupeGeo(sGeo)
         setBartGeo(bGeo)
         setAssemblyGeo(aGeo)
-        setResults(generateMockResults(pGeo))
+        setResults(generatePrecinctResults(pGeo))
         setLoading(false)
       } catch (err) {
         console.error('Failed to load geography data:', err)

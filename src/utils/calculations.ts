@@ -1,4 +1,4 @@
-import type { GeneratedResult } from '../data/mockResults'
+import type { GeneratedResult } from '../data/precinctResults'
 
 export interface RegionAvg {
   id: string

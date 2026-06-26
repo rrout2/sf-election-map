@@ -68,7 +68,7 @@ function buildRealDataLookup(): Map<string, Map<string, GeneratedResult>> {
   return lookup
 }
 
-export function generateMockResults(precinctGeo: FeatureCollection): GeneratedResult[] {
+export function generatePrecinctResults(precinctGeo: FeatureCollection): GeneratedResult[] {
   const realLookup = buildRealDataLookup()
   const results: GeneratedResult[] = []
 
@@ -112,37 +112,4 @@ export function generateMockResults(precinctGeo: FeatureCollection): GeneratedRe
   }
 
   return results
-}
-
-export function buildRegionLookup(precinctGeo: FeatureCollection): Map<string, string[]> {
-  const lookup = new Map<string, string[]>()
-  for (const feat of precinctGeo.features) {
-    const precinctId = String(feat.properties.prec_2022 ?? '')
-    const supe = String(feat.properties.supe22 ?? '')
-    if (!lookup.has(supe)) lookup.set(supe, [])
-    lookup.get(supe)!.push(precinctId)
-  }
-  return lookup
-}
-
-export function buildAssemblyLookup(precinctGeo: FeatureCollection): Map<string, string[]> {
-  const lookup = new Map<string, string[]>()
-  for (const feat of precinctGeo.features) {
-    const precinctId = String(feat.properties.prec_2022 ?? '')
-    const ad = String(feat.properties.assemb22 ?? '')
-    if (!lookup.has(ad)) lookup.set(ad, [])
-    lookup.get(ad)!.push(precinctId)
-  }
-  return lookup
-}
-
-export function buildBARTLookup(precinctGeo: FeatureCollection): Map<string, string[]> {
-  const lookup = new Map<string, string[]>()
-  for (const feat of precinctGeo.features) {
-    const precinctId = String(feat.properties.prec_2022 ?? '')
-    const bart = String(feat.properties.bart22 ?? '')
-    if (!lookup.has(bart)) lookup.set(bart, [])
-    lookup.get(bart)!.push(precinctId)
-  }
-  return lookup
 }
