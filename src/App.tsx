@@ -161,9 +161,14 @@ export default function App() {
         <div className="sidebar-header">
           <div className="sidebar-header-row">
             <h1>DSA SF Election Map</h1>
-            <button className="dark-toggle" onClick={() => setDark((v) => !v)}>
-              {dark ? '\u2600' : '\u263E'}
-            </button>
+            <span className="header-buttons">
+              <button className="dark-toggle" onClick={() => setDark((v) => !v)}>
+                {dark ? '\u2600' : '\u263E'}
+              </button>
+              <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>
+                {'\u2715'}
+              </button>
+            </span>
           </div>
           <p>Average yes % for DSA-endorsed ballot measures</p>
         </div>
@@ -197,8 +202,8 @@ export default function App() {
         />
       </div>
       <div className="map-container">
-        <button className="sidebar-toggle" onClick={() => setSidebarOpen((v) => !v)}>
-          {sidebarOpen ? '\u2715' : '\u2630'}
+        <button className="sidebar-hamburger" onClick={() => setSidebarOpen(true)}>
+          {'\u2630'}
         </button>
         <MapView
           geographyType={geographyType}
