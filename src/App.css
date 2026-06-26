@@ -238,8 +238,143 @@
   color: #333;
 }
 
+.sidebar-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dark-toggle {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  color: #666;
+  transition: background 0.15s;
+}
+
+.dark-toggle:hover {
+  background: #f0f0f0;
+}
+
 .sidebar-toggle:hover {
   background: #f0f0f0;
+}
+
+.dark .sidebar {
+  background: #1a1a2e;
+  border-right-color: #333;
+}
+
+.dark .sidebar-header {
+  border-bottom-color: #333;
+}
+
+.dark .sidebar-header h1 {
+  color: #e0e0e0;
+}
+
+.dark .sidebar-header p {
+  color: #999;
+}
+
+.dark .dark-toggle {
+  color: #999;
+}
+
+.dark .dark-toggle:hover {
+  background: #2a2a3e;
+}
+
+.dark .geography-selector {
+  border-bottom-color: #333;
+}
+
+.dark .geography-selector h2 {
+  color: #888;
+}
+
+.dark .geo-btn {
+  background: #2a2a3e;
+  border-color: #444;
+  color: #ccc;
+}
+
+.dark .geo-btn:hover {
+  background: #333;
+}
+
+.dark .geo-btn.active {
+  background: #1a73e8;
+  border-color: #1a73e8;
+  color: #fff;
+}
+
+.dark .jackie-toggle {
+  border-bottom-color: #333;
+  color: #ccc;
+}
+
+.dark .measure-panel h2 {
+  color: #888;
+}
+
+.dark .hint {
+  color: #777;
+}
+
+.dark .election-group h3 {
+  color: #aaa;
+  border-bottom-color: #333;
+}
+
+.dark .measure-title {
+  color: #ccc;
+}
+
+.dark .sidebar-toggle {
+  background: #2a2a3e;
+  color: #ccc;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.dark .legend {
+  background: rgba(30, 30, 50, 0.95);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.dark .legend-stats {
+  color: #aaa;
+}
+
+.dark .legend-label {
+  color: #aaa;
+}
+
+.dark .mapboxgl-popup-content {
+  background: #2a2a3e;
+  color: #e0e0e0;
+}
+
+.dark .mapboxgl-popup-tip {
+  border-top-color: #2a2a3e;
+}
+
+.dark .loading {
+  color: #999;
+}
+
+.dark .loading.error {
+  color: #e55;
 }
 
 @media (max-width: 768px) {
@@ -258,6 +393,10 @@
     z-index: 10;
     transition: transform 0.2s ease;
     box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+  }
+
+  .dark .sidebar {
+    box-shadow: 2px 0 12px rgba(0,0,0,0.4);
   }
 
   .sidebar--closed {

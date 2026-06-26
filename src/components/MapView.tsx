@@ -66,6 +66,7 @@ interface MapViewProps {
   precinctAverages: Map<string, number>
   regionAverages: Map<string, number>
   selectedMeasures: string[]
+  dark: boolean
 }
 
 export default function MapView({
@@ -77,6 +78,7 @@ export default function MapView({
   precinctAverages,
   regionAverages,
   selectedMeasures,
+  dark,
 }: MapViewProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const mapRef = useRef<mapboxgl.Map | null>(null)
@@ -95,6 +97,7 @@ export default function MapView({
 
   const geographyTypeRef = useRef(geographyType)
   geographyTypeRef.current = geographyType
+  const setupLayersRef = useRef<() => void>(() => {})
 
   useEffect(() => {
     if (mapRef.current) return
@@ -123,7 +126,8 @@ export default function MapView({
 
     map.addControl(new mapboxgl.NavigationControl(), 'top-right')
 
-    map.on('load', () => {
+    function setupLayers() {
+      if (map.getSource(SOURCE_ID)) return
       map.addSource(SOURCE_ID, {
         type: 'geojson',
         data: geoDataRef.current as unknown as Record<string, unknown>,
@@ -171,57 +175,86 @@ export default function MapView({
           'line-opacity': 0.5,
         },
       })
+    }
 
-      let popup: mapboxgl.Popup | null = null
-      let hoveredId: string | number | undefined
+    map.on('load', setupLayers)
+    setupLayersRef.current = setupLayers
 
-      map.on('mousemove', FILL_LAYER, (e) => {
-        map.getCanvas().style.cursor = e.features && e.features.length > 0 ? 'pointer' : ''
+    let popup: mapboxgl.Popup | null = null
+    let hoveredId: string | number | undefined
+    let pinned = false
 
-        if (!e.features || e.features.length === 0) {
-          popup?.remove()
-          popup = null
-          if (hoveredId !== undefined) {
-            map.removeFeatureState({ source: SOURCE_ID, id: hoveredId })
-            hoveredId = undefined
-          }
-          return
-        }
+    function showPopup(featId: string | number | undefined, lngLat: mapboxgl.LngLat, name: string, pctStr: string) {
+      if (featId !== undefined && featId !== hoveredId) {
+        if (hoveredId !== undefined) map.removeFeatureState({ source: SOURCE_ID, id: hoveredId })
+        map.setFeatureState({ source: SOURCE_ID, id: featId }, { hover: true })
+        hoveredId = featId
+      }
+      if (popup) {
+        popup.setLngLat(lngLat).setHTML(
+          `<h4>${name}</h4><p>Avg yes: ${pctStr}</p><p>(${selectedMeasuresRef.current.length} measures)</p>`,
+        )
+      } else {
+        popup = new mapboxgl.Popup({ closeButton: false })
+          .setLngLat(lngLat)
+          .setHTML(`<h4>${name}</h4><p>Avg yes: ${pctStr}</p><p>(${selectedMeasuresRef.current.length} measures)</p>`)
+          .addTo(map)
+      }
+    }
 
-        const feat = e.features[0]
-        const featId = (feat as unknown as Record<string, unknown>).id as string | number | undefined
-        if (featId !== undefined && featId !== hoveredId) {
-          if (hoveredId !== undefined) map.removeFeatureState({ source: SOURCE_ID, id: hoveredId })
-          map.setFeatureState({ source: SOURCE_ID, id: featId }, { hover: true })
-          hoveredId = featId
-        }
+    function clearHover() {
+      if (hoveredId !== undefined) {
+        map.removeFeatureState({ source: SOURCE_ID, id: hoveredId })
+        hoveredId = undefined
+      }
+    }
 
-        const props = (feat as unknown as Record<string, unknown>).properties as Record<string, unknown> | undefined
-        const name = (props?.name as string) ?? 'Unknown'
-        const avg = (props?.avgYes as number) ?? -1
-        const pctStr = avg >= 0 ? `${Math.round(avg)}%` : 'No data'
+    function popupContent(feat: Record<string, unknown>): { featId: string | number | undefined; name: string; pctStr: string } {
+      const props = feat.properties as Record<string, unknown> | undefined
+      const name = (props?.name as string) ?? 'Unknown'
+      const avg = (props?.avgYes as number) ?? -1
+      const pctStr = avg >= 0 ? `${Math.round(avg)}%` : 'No data'
+      const featId = feat.id as string | number | undefined
+      return { featId, name, pctStr }
+    }
 
-        if (popup) {
-          popup.setLngLat(e.lngLat).setHTML(
-            `<h4>${name}</h4><p>Avg yes: ${pctStr}</p><p>(${selectedMeasuresRef.current.length} measures)</p>`,
-          )
-        } else {
-          popup = new mapboxgl.Popup({ closeButton: false })
-            .setLngLat(e.lngLat)
-            .setHTML(`<h4>${name}</h4><p>Avg yes: ${pctStr}</p><p>(${selectedMeasuresRef.current.length} measures)</p>`)
-            .addTo(map)
-        }
-      })
-
-      map.on('mouseleave', FILL_LAYER, () => {
-        map.getCanvas().style.cursor = ''
+    map.on('click', (e) => {
+      const features = e.point ? map.queryRenderedFeatures(e.point, { layers: [FILL_LAYER] }) : []
+      if (features.length > 0) {
+        const { featId, name, pctStr } = popupContent(features[0] as unknown as Record<string, unknown>)
+        pinned = true
+        showPopup(featId, e.lngLat, name, pctStr)
+      } else {
+        pinned = false
         popup?.remove()
         popup = null
-        if (hoveredId !== undefined) {
-          map.removeFeatureState({ source: SOURCE_ID, id: hoveredId })
-          hoveredId = undefined
-        }
-      })
+        clearHover()
+      }
+    })
+
+    map.on('mousemove', FILL_LAYER, (e) => {
+      map.getCanvas().style.cursor = e.features && e.features.length > 0 ? 'pointer' : ''
+
+      if (!e.features || e.features.length === 0) {
+        if (pinned) return
+        popup?.remove()
+        popup = null
+        clearHover()
+        return
+      }
+
+      if (pinned) return
+
+      const { featId, name, pctStr } = popupContent(e.features[0] as unknown as Record<string, unknown>)
+      showPopup(featId, e.lngLat, name, pctStr)
+    })
+
+    map.on('mouseleave', FILL_LAYER, () => {
+      map.getCanvas().style.cursor = ''
+      if (pinned) return
+      popup?.remove()
+      popup = null
+      clearHover()
     })
 
     mapRef.current = map
@@ -231,6 +264,18 @@ export default function MapView({
       mapRef.current = null
     }
   }, [])
+
+  const darkRef = useRef(dark)
+  darkRef.current = dark
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+    map.setStyle(`mapbox://styles/mapbox/${dark ? 'dark' : 'light'}-v11`)
+    map.once('style.load', () => {
+      setupLayersRef.current()
+    })
+  }, [dark])
 
   useEffect(() => {
     const map = mapRef.current

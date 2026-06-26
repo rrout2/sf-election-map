@@ -25,6 +25,14 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
+  const [dark, setDark] = useState(prefersDark.matches)
+
+  useEffect(() => {
+    function onChange(e: MediaQueryListEvent) { setDark(e.matches) }
+    prefersDark.addEventListener('change', onChange)
+    return () => prefersDark.removeEventListener('change', onChange)
+  }, [prefersDark])
 
   useEffect(() => {
     async function load() {
@@ -137,10 +145,15 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app${dark ? ' dark' : ''}`}>
       <div className={`sidebar${sidebarOpen ? '' : ' sidebar--closed'}`}>
         <div className="sidebar-header">
-          <h1>DSA SF Election Map</h1>
+          <div className="sidebar-header-row">
+            <h1>DSA SF Election Map</h1>
+            <button className="dark-toggle" onClick={() => setDark((v) => !v)}>
+              {dark ? '\u2600' : '\u263E'}
+            </button>
+          </div>
           <p>Average yes % for DSA-endorsed ballot measures</p>
         </div>
         <GeographySelector value={geographyType} onChange={setGeographyType} />
@@ -183,6 +196,7 @@ export default function App() {
           precinctAverages={precinctAverages}
           regionAverages={regionAverages}
           selectedMeasures={selectedMeasures}
+          dark={dark}
         />
         <div className="legend-overlay">
           <Legend numSelected={selectedMeasures.length} geographyType={geographyType} />
