@@ -122,7 +122,6 @@ export default function MapView({
     }, { passive: false })
 
     map.addControl(new mapboxgl.NavigationControl(), 'top-right')
-    map.addControl(new mapboxgl.ScaleControl())
 
     map.on('load', () => {
       map.addSource(SOURCE_ID, {

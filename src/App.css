@@ -163,7 +163,7 @@
 
 .legend-overlay {
   position: absolute;
-  bottom: 20px;
+  bottom: 30px;
   right: 20px;
   z-index: 2;
 }
@@ -216,4 +216,91 @@
 .mapboxgl-popup-content h4 {
   font-size: 13px;
   margin-bottom: 4px;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 20;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  font-size: 18px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  color: #333;
+}
+
+.sidebar-toggle:hover {
+  background: #f0f0f0;
+}
+
+@media (max-width: 768px) {
+  .app {
+    position: relative;
+  }
+
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: 320px;
+    min-width: unset;
+    height: 100%;
+    z-index: 10;
+    transition: transform 0.2s ease;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+  }
+
+  .sidebar--closed {
+    transform: translateX(-100%);
+    box-shadow: none;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+
+  .legend-overlay {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .legend {
+    padding: 8px 10px;
+  }
+
+  .legend-stats {
+    font-size: 10px;
+    gap: 10px;
+  }
+
+  .sidebar-header h1 {
+    font-size: 16px;
+  }
+
+  .sidebar-header {
+    padding: 12px 16px 10px;
+  }
+
+  .geography-selector {
+    padding: 10px 16px;
+  }
+
+  .jackie-toggle {
+    padding: 8px 16px;
+  }
+
+  .measure-panel {
+    padding: 10px 16px;
+  }
+
 }

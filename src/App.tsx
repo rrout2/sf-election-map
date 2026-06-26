@@ -24,6 +24,7 @@ export default function App() {
   const [results, setResults] = useState<GeneratedResult[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -137,7 +138,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <div className="sidebar">
+      <div className={`sidebar${sidebarOpen ? '' : ' sidebar--closed'}`}>
         <div className="sidebar-header">
           <h1>DSA SF Election Map</h1>
           <p>Average yes % for DSA-endorsed ballot measures</p>
@@ -170,6 +171,9 @@ export default function App() {
         />
       </div>
       <div className="map-container">
+        <button className="sidebar-toggle" onClick={() => setSidebarOpen((v) => !v)}>
+          {sidebarOpen ? '\u2715' : '\u2630'}
+        </button>
         <MapView
           geographyType={geographyType}
           precinctGeo={precinctGeo}
