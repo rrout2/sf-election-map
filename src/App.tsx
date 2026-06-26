@@ -39,12 +39,13 @@ export default function App() {
   useEffect(() => {
     async function load() {
       try {
+        const base = import.meta.env.BASE_URL
         const [precinctRes, supeRes, bartRes, assemblyRes, citywideRes] = await Promise.all([
-          fetch('/precincts.geojson'),
-          fetch('/supervisor-districts.geojson'),
-          fetch('/bart-districts.geojson'),
-          fetch('/assembly-districts.geojson'),
-          fetch('/citywide.geojson'),
+          fetch(`${base}precincts.geojson`),
+          fetch(`${base}supervisor-districts.geojson`),
+          fetch(`${base}bart-districts.geojson`),
+          fetch(`${base}assembly-districts.geojson`),
+          fetch(`${base}citywide.geojson`),
         ])
 
         const [pGeo, sGeo, bGeo, aGeo, cwGeo] = await Promise.all([
