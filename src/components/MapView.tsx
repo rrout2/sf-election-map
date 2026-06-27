@@ -137,7 +137,7 @@ export default function MapView({
       if (map.getSource(SOURCE_ID)) return
       map.addSource(SOURCE_ID, {
         type: 'geojson',
-        data: geoDataRef.current as unknown as Record<string, unknown>,
+        data: geoDataRef.current as unknown as mapboxgl.GeoJSONSourceSpecification['data'],
       })
 
       map.addLayer({
@@ -153,12 +153,11 @@ export default function MapView({
               ['linear'],
               ['coalesce', ['get', 'avgYes'], 0],
               25, '#b42d2d',
-              35, '#ff7850',
-              45, '#ffb464',
-              55, '#ffe18c',
-              65, '#8ca54b',
-              75, '#3ca54b',
-              85, '#16782d',
+              30, '#ff7850',
+              40, '#ffb464',
+              50, '#8ca54b',
+              60, '#3ca54b',
+              70, '#16782d',
             ],
             'rgba(0,0,0,0)',
           ],

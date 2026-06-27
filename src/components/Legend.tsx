@@ -4,17 +4,17 @@ interface LegendProps {
 }
 
 const STOPS = [
-  { pct: '<35%', color: '#b42d2d' },
-  { pct: '35-45%', color: '#ff7850' },
-  { pct: '45-55%', color: '#ffb464' },
-  { pct: '55-65%', color: '#ffe18c' },
-  { pct: '65-75%', color: '#8ca54b' },
-  { pct: '75-85%', color: '#3ca54b' },
-  { pct: '>85%', color: '#16782d' },
+  { pct: '<30%', color: '#b42d2d' },
+  { pct: '30-40%', color: '#ff7850' },
+  { pct: '40-50%', color: '#ffb464' },
+  { pct: '50-60%', color: '#8ca54b' },
+  { pct: '60-70%', color: '#3ca54b' },
+  { pct: '>70%', color: '#16782d' },
 ]
 
 export default function Legend({ numSelected, geographyType }: LegendProps) {
   const geoLabel = geographyType === 'precincts' ? 'Precincts'
+    : geographyType === 'neighborhoods' ? 'Neighborhoods'
     : geographyType === 'supervisor' ? 'Sup. Districts'
     : geographyType === 'assembly' ? 'Assembly Districts'
     : geographyType === 'bart' ? 'BART Districts'
