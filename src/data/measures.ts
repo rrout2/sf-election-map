@@ -7,6 +7,7 @@ export const measures: Measure[] = [
     election: 'June 2018',
     date: '2018-06-05',
     description: 'Tax on Commercial Rents for Childcare and Education',
+    category: 'tax',
   },
   {
     id: '2018-06-prop-f',
@@ -14,6 +15,7 @@ export const measures: Measure[] = [
     election: 'June 2018',
     date: '2018-06-05',
     description: 'Right to Counsel for tenants facing eviction',
+    category: 'other',
   },
   {
     id: '2018-06-prop-g',
@@ -21,6 +23,7 @@ export const measures: Measure[] = [
     election: 'June 2018',
     date: '2018-06-05',
     description: 'SFUSD Parcel Tax for teacher salaries and student programs',
+    category: 'tax',
   },
   {
     id: '2018-11-prop-c',
@@ -28,6 +31,7 @@ export const measures: Measure[] = [
     election: 'Nov 2018',
     date: '2018-11-06',
     description: 'Tax on gross receipts for homeless services',
+    category: 'tax',
   },
   {
     id: '2020-03-jackie-primary',
@@ -35,6 +39,7 @@ export const measures: Measure[] = [
     election: 'Mar 2020',
     date: '2020-03-03',
     description: 'Jackie Fielder for State Senate Primary',
+    category: 'candidate',
   },
   {
     id: '2020-11-prop-i',
@@ -42,6 +47,7 @@ export const measures: Measure[] = [
     election: 'Nov 2020',
     date: '2020-11-03',
     description: 'Increase transfer tax on properties over $10M',
+    category: 'tax',
   },
   {
     id: '2020-11-prop-k',
@@ -49,6 +55,7 @@ export const measures: Measure[] = [
     election: 'Nov 2020',
     date: '2020-11-03',
     description: 'Authorization for social housing development',
+    category: 'other',
   },
   {
     id: '2020-11-jackie-general',
@@ -56,6 +63,7 @@ export const measures: Measure[] = [
     election: 'Nov 2020',
     date: '2020-11-03',
     description: 'Jackie Fielder for State Senate General',
+    category: 'candidate',
   },
   {
     id: '2022-11-prop-m',
@@ -63,6 +71,7 @@ export const measures: Measure[] = [
     election: 'Nov 2022',
     date: '2022-11-08',
     description: 'Tax on vacant residential units',
+    category: 'tax',
   },
   {
     id: '2022-11-prop-o',
@@ -70,6 +79,7 @@ export const measures: Measure[] = [
     election: 'Nov 2022',
     date: '2022-11-08',
     description: 'Parcel tax for City College of SF',
+    category: 'tax',
   },
   {
     id: '2022-11-prop-h',
@@ -77,6 +87,7 @@ export const measures: Measure[] = [
     election: 'Nov 2022',
     date: '2022-11-08',
     description: 'Move local elections to even-numbered years',
+    category: 'other',
   },
   {
     id: '2024-11-prop-l',
@@ -84,5 +95,6 @@ export const measures: Measure[] = [
     election: 'Nov 2024',
     date: '2024-11-05',
     description: 'Tax on ride-hail trips to fund Muni',
+    category: 'tax',
   },
 ]

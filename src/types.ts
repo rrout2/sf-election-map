@@ -4,6 +4,7 @@ export interface Measure {
   election: string
   date: string
   description: string
+  category: 'tax' | 'candidate' | 'other'
 }
 
 export interface PrecinctResult {

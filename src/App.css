@@ -149,6 +149,7 @@
   border-color: #1a73e8;
 }
 
+.toggle-row,
 .jackie-toggle {
   display: flex;
   align-items: center;
@@ -161,7 +162,8 @@
   color: #444;
 }
 
-.jackie-toggle input {
+.jackie-toggle input,
+.toggle-row input {
   margin: 0;
   flex-shrink: 0;
 }
@@ -244,6 +246,11 @@
 .measure-row input {
   margin-top: 2px;
   flex-shrink: 0;
+}
+
+.measure-row--dimmed {
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 .measure-title {
@@ -445,6 +452,7 @@
   color: #fff;
 }
 
+.dark .toggle-row,
 .dark .jackie-toggle {
   border-bottom-color: #333;
   color: #ccc;
@@ -607,6 +615,7 @@
     padding: 10px 16px;
   }
 
+  .toggle-row,
   .jackie-toggle {
     padding: 8px 16px;
   }

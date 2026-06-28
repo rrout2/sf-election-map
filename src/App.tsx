@@ -27,6 +27,7 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [taxesOnly, setTaxesOnly] = useState(false)
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
   const [dark, setDark] = useState(prefersDark.matches)
 
@@ -146,6 +147,15 @@ export default function App() {
     )
   }, [])
 
+  const handleTaxesOnly = useCallback((on: boolean) => {
+    setTaxesOnly(on)
+    if (on) {
+      setSelectedMeasures(measures.filter((m) => m.category === 'tax').map((m) => m.id))
+    } else {
+      setSelectedMeasures(measures.map((m) => m.id))
+    }
+  }, [])
+
   if (loading) {
     return <div className="app"><div className="loading">Loading geography data...</div></div>
   }
@@ -173,7 +183,15 @@ export default function App() {
           <p>Average yes % for DSA-endorsed ballot measures</p>
         </div>
         <GeographySelector value={geographyType} onChange={setGeographyType} />
-        <label className="jackie-toggle">
+        <label className="toggle-row">
+          <input
+            type="checkbox"
+            checked={taxesOnly}
+            onChange={(e) => handleTaxesOnly(e.target.checked)}
+          />
+          <span>Taxes only</span>
+        </label>
+        <label className="toggle-row">
           <input
             type="checkbox"
             checked={selectedMeasures.some((id) => id.includes('jackie'))}
@@ -197,8 +215,19 @@ export default function App() {
           measures={measures}
           selected={selectedMeasures}
           onToggle={handleToggle}
-          onSelectAll={() => setSelectedMeasures(measures.map((m) => m.id))}
-          onDeselectAll={() => setSelectedMeasures([])}
+          onSelectAll={() => {
+            const target = taxesOnly
+              ? measures.filter((m) => m.category === 'tax')
+              : measures
+            setSelectedMeasures(target.map((m) => m.id))
+          }}
+          onDeselectAll={() => {
+            const keep = taxesOnly
+              ? measures.filter((m) => m.category !== 'tax')
+              : []
+            setSelectedMeasures(keep.map((m) => m.id))
+          }}
+          taxesOnly={taxesOnly}
         />
       </div>
       <div className={`sidebar-backdrop${sidebarOpen ? '' : ' sidebar-backdrop--hidden'}`} onClick={() => setSidebarOpen(false)} />
