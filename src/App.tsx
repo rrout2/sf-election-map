@@ -28,6 +28,9 @@ export default function App() {
   const [error, setError] = useState<string>()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [taxesOnly, setTaxesOnly] = useState(false)
+  const [savedSelection, setSavedSelection] = useState<string[]>([])
+  // When taxesOnly toggles on, stash current selection and keep only tax measures.
+  // When toggling off, restore the stashed selection.
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
   const [dark, setDark] = useState(prefersDark.matches)
 
@@ -164,11 +167,18 @@ export default function App() {
   const handleTaxesOnly = useCallback((on: boolean) => {
     setTaxesOnly(on)
     if (on) {
+      setSavedSelection(selectedMeasures)
       setSelectedMeasures(measures.filter((m) => m.category === 'tax').map((m) => m.id))
-    } else {
-      setSelectedMeasures(measures.map((m) => m.id))
     }
-  }, [])
+  }, [selectedMeasures])
+
+  // When toggling taxesOnly off, restore saved selection
+  useEffect(() => {
+    if (!taxesOnly && savedSelection.length > 0) {
+      setSelectedMeasures(savedSelection)
+      setSavedSelection([])
+    }
+  }, [taxesOnly])
 
   if (loading) {
     return <div className="app"><div className="loading">Loading geography data...</div></div>

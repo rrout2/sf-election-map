@@ -205,10 +205,13 @@ export default function MapView({
     let pinned = false
 
     function popupHtml(name: string, pctStr: string, avgVotes: number, maxVotes: number, maxMeasureTitle: string) {
-      return `<h4>${name}</h4>
-<p>Average yes: ${pctStr} (${selectedMeasuresRef.current.length} measures)</p>
-<p>Average votes: ${Math.round(avgVotes).toLocaleString()}</p>
-<p>Highest votes: ${Math.round(maxVotes).toLocaleString()} (${maxMeasureTitle})</p>`
+      return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;min-width:180px">
+<div><h4 style="margin:0">${name}</h4>
+<p style="margin:4px 0 0;font-size:11px">${selectedMeasuresRef.current.length} measures</p></div>
+<span style="font-size:22px;font-weight:700;line-height:1;flex-shrink:0">${pctStr}</span>
+</div>
+<p style="margin:8px 0 0;font-size:11px">Avg votes: ${Math.round(avgVotes).toLocaleString()}</p>
+<p style="margin:2px 0 0;font-size:11px">Highest: ${Math.round(maxVotes).toLocaleString()} (${maxMeasureTitle})</p>`
     }
 
     function showPopup(featId: string | number | undefined, lngLat: mapboxgl.LngLat, name: string, pctStr: string, avgVotes: number, maxVotes: number, maxMeasureTitle: string) {
@@ -239,7 +242,7 @@ export default function MapView({
       const props = feat.properties as Record<string, unknown> | undefined
       const name = (props?.name as string) ?? 'Unknown'
       const avg = (props?.avgYes as number) ?? -1
-      const pctStr = avg >= 0 ? `${Math.round(avg)}%` : 'No data'
+      const pctStr = avg >= 0 ? `${avg.toFixed(1)}%` : 'No data'
       const avgVotes = (props?.avgVotes as number) ?? -1
       const maxVotes = (props?.maxVotes as number) ?? -1
       const maxMeasureId = (props?.maxMeasureId as string) ?? ''
