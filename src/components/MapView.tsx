@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
-import type { GeographyType, FeatureCollection } from '../types'
+import type { GeographyType, FeatureCollection, Measure } from '../types'
 
 const SF_CENTER: [number, number] = [-122.4194, 37.7749]
 
@@ -12,6 +12,8 @@ function buildGeoData(
   geographyType: GeographyType,
   precinctAverages: Map<string, number>,
   regionAverages: Map<string, number>,
+  regionVoteStats: Map<string, { avgVotes: number; maxVotes: number; maxMeasureId: string }>,
+  precinctVoteStats: Map<string, { avgVotes: number; maxVotes: number; maxMeasureId: string }>,
   precinctGeo?: FeatureCollection,
   supeGeo?: FeatureCollection,
   assemblyGeo?: FeatureCollection,
@@ -44,6 +46,9 @@ function buildGeoData(
       const avg = geographyType === 'precincts'
         ? precinctAverages.get(id)
         : regionAverages.get(id)
+      const voteStats = geographyType === 'precincts'
+        ? precinctVoteStats.get(id)
+        : regionVoteStats.get(id)
       const label = geographyType === 'supervisor' ? `District ${id}`
         : geographyType === 'assembly' ? `AD ${id}`
         : geographyType === 'bart' ? `BART District ${id}`
@@ -56,6 +61,9 @@ function buildGeoData(
           ...f.properties,
           name: label,
           avgYes: avg ?? -1,
+          avgVotes: voteStats?.avgVotes ?? -1,
+          maxVotes: voteStats?.maxVotes ?? -1,
+          maxMeasureId: voteStats?.maxMeasureId ?? '',
         },
       } as FeatureCollection['features'][number]
     }),
@@ -71,6 +79,9 @@ interface MapViewProps {
   citywideGeo?: FeatureCollection
   precinctAverages: Map<string, number>
   regionAverages: Map<string, number>
+  regionVoteStats: Map<string, { avgVotes: number; maxVotes: number; maxMeasureId: string }>
+  precinctVoteStats: Map<string, { avgVotes: number; maxVotes: number; maxMeasureId: string }>
+  measures: Measure[]
   selectedMeasures: string[]
   dark: boolean
 }
@@ -84,6 +95,9 @@ export default function MapView({
   citywideGeo,
   precinctAverages,
   regionAverages,
+  regionVoteStats,
+  precinctVoteStats,
+  measures,
   selectedMeasures,
   dark,
 }: MapViewProps) {
@@ -95,7 +109,7 @@ export default function MapView({
     features: [],
   })
   geoDataRef.current = buildGeoData(
-    geographyType, precinctAverages, regionAverages,
+    geographyType, precinctAverages, regionAverages, regionVoteStats, precinctVoteStats,
     precinctGeo, supeGeo, assemblyGeo, bartGeo, citywideGeo,
   )
 
@@ -190,20 +204,26 @@ export default function MapView({
     let hoveredId: string | number | undefined
     let pinned = false
 
-    function showPopup(featId: string | number | undefined, lngLat: mapboxgl.LngLat, name: string, pctStr: string) {
+    function popupHtml(name: string, pctStr: string, avgVotes: number, maxVotes: number, maxMeasureTitle: string) {
+      return `<h4>${name}</h4>
+<p>Average yes: ${pctStr} (${selectedMeasuresRef.current.length} measures)</p>
+<p>Average votes: ${Math.round(avgVotes).toLocaleString()}</p>
+<p>Highest votes: ${Math.round(maxVotes).toLocaleString()} (${maxMeasureTitle})</p>`
+    }
+
+    function showPopup(featId: string | number | undefined, lngLat: mapboxgl.LngLat, name: string, pctStr: string, avgVotes: number, maxVotes: number, maxMeasureTitle: string) {
       if (featId !== undefined && featId !== hoveredId) {
         if (hoveredId !== undefined) map.removeFeatureState({ source: SOURCE_ID, id: hoveredId })
         map.setFeatureState({ source: SOURCE_ID, id: featId }, { hover: true })
         hoveredId = featId
       }
+      const html = popupHtml(name, pctStr, avgVotes, maxVotes, maxMeasureTitle)
       if (popup) {
-        popup.setLngLat(lngLat).setHTML(
-          `<h4>${name}</h4><p>Avg yes: ${pctStr}</p><p>(${selectedMeasuresRef.current.length} measures)</p>`,
-        )
+        popup.setLngLat(lngLat).setHTML(html)
       } else {
         popup = new mapboxgl.Popup({ closeButton: false })
           .setLngLat(lngLat)
-          .setHTML(`<h4>${name}</h4><p>Avg yes: ${pctStr}</p><p>(${selectedMeasuresRef.current.length} measures)</p>`)
+          .setHTML(html)
           .addTo(map)
       }
     }
@@ -215,13 +235,19 @@ export default function MapView({
       }
     }
 
-    function popupContent(feat: Record<string, unknown>): { featId: string | number | undefined; name: string; pctStr: string } {
+    function popupContent(feat: Record<string, unknown>): { featId: string | number | undefined; name: string; pctStr: string; avgVotes: number; maxVotes: number; maxMeasureTitle: string } {
       const props = feat.properties as Record<string, unknown> | undefined
       const name = (props?.name as string) ?? 'Unknown'
       const avg = (props?.avgYes as number) ?? -1
       const pctStr = avg >= 0 ? `${Math.round(avg)}%` : 'No data'
+      const avgVotes = (props?.avgVotes as number) ?? -1
+      const maxVotes = (props?.maxVotes as number) ?? -1
+      const maxMeasureId = (props?.maxMeasureId as string) ?? ''
+      const maxMeasureTitle = selectedMeasuresRef.current.length > 0
+        ? (measures.find((m) => m.id === maxMeasureId)?.title ?? maxMeasureId)
+        : ''
       const featId = feat.id as string | number | undefined
-      return { featId, name, pctStr }
+      return { featId, name, pctStr, avgVotes, maxVotes, maxMeasureTitle }
     }
 
     map.on('click', (e) => {
@@ -231,9 +257,9 @@ export default function MapView({
 
       const features = e.point ? map.queryRenderedFeatures(e.point, { layers: [FILL_LAYER] }) : []
       if (features.length > 0) {
-        const { featId, name, pctStr } = popupContent(features[0] as unknown as Record<string, unknown>)
+        const { featId, name, pctStr, avgVotes, maxVotes, maxMeasureTitle } = popupContent(features[0] as unknown as Record<string, unknown>)
         pinned = true
-        showPopup(featId, e.lngLat, name, pctStr)
+        showPopup(featId, e.lngLat, name, pctStr, avgVotes, maxVotes, maxMeasureTitle)
       } else {
         pinned = false
       }
@@ -255,8 +281,8 @@ export default function MapView({
 
         if (pinned) return
 
-        const { featId, name, pctStr } = popupContent(e.features[0] as unknown as Record<string, unknown>)
-        showPopup(featId, e.lngLat, name, pctStr)
+        const { featId, name, pctStr, avgVotes, maxVotes, maxMeasureTitle } = popupContent(e.features[0] as unknown as Record<string, unknown>)
+        showPopup(featId, e.lngLat, name, pctStr, avgVotes, maxVotes, maxMeasureTitle)
       })
 
       map.on('mouseleave', FILL_LAYER, () => {

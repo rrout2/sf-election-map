@@ -5,7 +5,7 @@ import {
   generatePrecinctResults,
   type GeneratedResult,
 } from './data/precinctResults'
-import { calcRegionAverages, calcPrecinctAverages } from './utils/calculations'
+import { calcRegionAverages, calcPrecinctAverages, calcRegionVoteStats } from './utils/calculations'
 import MapView from './components/MapView'
 import MeasurePanel from './components/MeasurePanel'
 import GeographySelector from './components/GeographySelector'
@@ -141,6 +141,20 @@ export default function App() {
     return calcPrecinctAverages(results, selectedMeasures)
   }, [results, selectedMeasures])
 
+  const regionVoteStats = useMemo(() => {
+    if (results.length === 0 || selectedMeasures.length === 0) return new Map<string, { avgVotes: number; maxVotes: number; maxMeasureId: string }>()
+    return calcRegionVoteStats(results, precinctToRegion, selectedMeasures)
+  }, [results, precinctToRegion, selectedMeasures])
+
+  const precinctVoteStats = useMemo(() => {
+    if (results.length === 0 || selectedMeasures.length === 0) return new Map<string, { avgVotes: number; maxVotes: number; maxMeasureId: string }>()
+    const precinctToSelf = new Map<string, string>()
+    for (const r of results) {
+      if (!precinctToSelf.has(r.precinct)) precinctToSelf.set(r.precinct, r.precinct)
+    }
+    return calcRegionVoteStats(results, precinctToSelf, selectedMeasures)
+  }, [results, selectedMeasures])
+
   const handleToggle = useCallback((id: string) => {
     setSelectedMeasures((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
@@ -244,6 +258,9 @@ export default function App() {
           citywideGeo={citywideGeo}
           precinctAverages={precinctAverages}
           regionAverages={regionAverages}
+          regionVoteStats={regionVoteStats}
+          precinctVoteStats={precinctVoteStats}
+          measures={measures}
           selectedMeasures={selectedMeasures}
           dark={dark}
         />

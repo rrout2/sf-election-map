@@ -72,6 +72,58 @@ export function calcPrecinctAverages(
   return avgMap
 }
 
+export interface RegionVoteStats {
+  avgVotes: number
+  maxVotes: number
+  maxMeasureId: string
+}
+
+export function calcRegionVoteStats(
+  results: GeneratedResult[],
+  precinctToRegion: Map<string, string>,
+  selectedMeasures: string[],
+): Map<string, RegionVoteStats> {
+  const measureSet = new Set(selectedMeasures)
+
+  // First pass: aggregate yesVotes per (region, measure)
+  const regionMeasureTotals = new Map<string, Map<string, number>>()
+
+  for (const r of results) {
+    if (!measureSet.has(r.measureId)) continue
+    const regionId = precinctToRegion.get(r.precinct)
+    if (regionId === undefined) continue
+
+    let measureMap = regionMeasureTotals.get(regionId)
+    if (!measureMap) {
+      measureMap = new Map()
+      regionMeasureTotals.set(regionId, measureMap)
+    }
+    measureMap.set(r.measureId, (measureMap.get(r.measureId) ?? 0) + r.yesVotes)
+  }
+
+  // Second pass: compute avg and max from region-level totals
+  const out = new Map<string, RegionVoteStats>()
+  for (const [regionId, measureMap] of regionMeasureTotals) {
+    let totalYes = 0
+    let maxVotes = -Infinity
+    let maxMeasureId = ''
+    for (const [measureId, yesTotal] of measureMap) {
+      totalYes += yesTotal
+      if (yesTotal > maxVotes) {
+        maxVotes = yesTotal
+        maxMeasureId = measureId
+      }
+    }
+    const numMeasures = measureMap.size
+    out.set(regionId, {
+      avgVotes: numMeasures > 0 ? totalYes / numMeasures : 0,
+      maxVotes,
+      maxMeasureId,
+    })
+  }
+  return out
+}
+
 export function getPctColor(pct: number, opacity = 0.8): string {
   if (pct >= 75) return `rgba(22,120,45,${opacity})`
   if (pct >= 65) return `rgba(60,165,75,${opacity})`
