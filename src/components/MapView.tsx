@@ -147,7 +147,7 @@ export default function MapView({
         paint: {
           'fill-color': [
             'case',
-            ['>', ['coalesce', ['get', 'avgYes'], -1], -0.5],
+            ['>', ['coalesce', ['get', 'avgYes'], -1], 0],
             [
               'interpolate',
               ['linear'],
@@ -155,9 +155,9 @@ export default function MapView({
               25, '#b42d2d',
               30, '#ff7850',
               40, '#ffb464',
-              50, '#8ca54b',
-              60, '#3ca54b',
-              70, '#16782d',
+              50, '#8db87a',
+              60, '#4a9e6e',
+              70, '#2d7d5a',
             ],
             'rgba(0,0,0,0)',
           ],

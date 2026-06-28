@@ -7,9 +7,9 @@ const STOPS = [
   { pct: '<30%', color: '#b42d2d' },
   { pct: '30-40%', color: '#ff7850' },
   { pct: '40-50%', color: '#ffb464' },
-  { pct: '50-60%', color: '#8ca54b' },
-  { pct: '60-70%', color: '#3ca54b' },
-  { pct: '>70%', color: '#16782d' },
+  { pct: '50-60%', color: '#8db87a' },
+  { pct: '60-70%', color: '#4a9e6e' },
+  { pct: '>70%', color: '#2d7d5a' },
 ]
 
 export default function Legend({ numSelected, geographyType }: LegendProps) {
